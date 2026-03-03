@@ -1,29 +1,21 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const PROTECTED_ROUTES = ["/dashboard"];
-const AUTH_ROUTES = ["/login", "/signup"];
+const PUBLIC_PATHS = ["/login", "/signup"];
 
 export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
-    // Check for access token in cookies (set on login for SSR-safe auth)
-    const token = request.cookies.get("access_token")?.value;
-
-    const isProtected = PROTECTED_ROUTES.some((r) => pathname.startsWith(r));
-    const isAuthRoute = AUTH_ROUTES.some((r) => pathname.startsWith(r));
-
-    if (isProtected && !token) {
-        return NextResponse.redirect(new URL("/login", request.url));
+    // Allow public paths
+    if (PUBLIC_PATHS.some((p) => pathname.startsWith(p))) {
+        return NextResponse.next();
     }
 
-    if (isAuthRoute && token) {
-        return NextResponse.redirect(new URL("/dashboard", request.url));
-    }
-
+    // Client-side auth is done via localStorage — middleware just passes through
+    // Real protection is in the auth guard component
     return NextResponse.next();
 }
 
 export const config = {
-    matcher: ["/dashboard/:path*", "/login", "/signup"],
+    matcher: ["/((?!_next/static|_next/image|favicon.ico|api).*)"],
 };

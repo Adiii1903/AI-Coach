@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Allow images from any origin in dev
+  images: { unoptimized: true },
 };
 
 export default nextConfig;

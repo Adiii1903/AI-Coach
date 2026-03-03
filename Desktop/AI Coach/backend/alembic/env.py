@@ -18,6 +18,7 @@ from app.models.habit import Habit  # noqa: F401
 from app.models.habit_log import HabitLog  # noqa: F401
 from app.models.study_session import StudySession  # noqa: F401
 from app.models.ai_insight import AIInsight  # noqa: F401
+from app.models.study_plan import StudyPlan  # noqa: F401
 
 config = context.config
 

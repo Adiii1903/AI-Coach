@@ -1,21 +1,22 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
-
-const inter = Inter({ subsets: ["latin"] });
+import Providers from "./providers";
 
 export const metadata: Metadata = {
-  title: "AI Student Dashboard",
-  description:
-    "AI-powered productivity platform for students — track study sessions, manage habits, and get personalized coaching.",
+  title: "AI Coach — Productivity Dashboard",
+  description: "Your personal AI-powered productivity and study coach",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

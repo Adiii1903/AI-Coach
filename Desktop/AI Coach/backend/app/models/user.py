@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from app.models.habit import Habit
     from app.models.study_session import StudySession
     from app.models.ai_insight import AIInsight
+    from app.models.study_plan import StudyPlan
 
 
 class User(Base):
@@ -41,6 +42,9 @@ class User(Base):
     )
     ai_insights: Mapped[List["AIInsight"]] = relationship(
         "AIInsight", back_populates="user", cascade="all, delete-orphan"
+    )
+    study_plans: Mapped[List["StudyPlan"]] = relationship(
+        "StudyPlan", back_populates="user", cascade="all, delete-orphan"
     )
 
     # ─── Explicit named indexes ──────────────────────────────────────────────
