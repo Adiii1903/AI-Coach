@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request, status
+from fastapi import APIRouter, Depends, Request, Response, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi_limiter import FastAPILimiter
 from fastapi_limiter.depends import RateLimiter
@@ -20,18 +20,23 @@ security = HTTPBearer()
 
 
 def optional_rate_limiter(times: int, seconds: int):
-    """Returns a RateLimiter dependency only when Redis is available, else a no-op."""
-    async def _no_op(request: Request):
-        pass  # Redis not available — rate limiting skipped
+    """
+    Returns an async dependency that applies rate limiting only when Redis is
+    available.  The Redis check is deferred to *request time* (not import/decoration
+    time) so that it correctly reflects the lifespan-initialised state.
+    """
+    rate_limiter = RateLimiter(times=times, seconds=seconds)
 
-    try:
-        # FastAPILimiter.redis is set only after a successful .init()
-        if FastAPILimiter.redis is None:
-            return _no_op
-    except Exception:
-        return _no_op
+    async def _dependency(request: Request):
+        try:
+            # FastAPILimiter.redis is None until lifespan calls FastAPILimiter.init()
+            if FastAPILimiter.redis is None:
+                return  # Redis not available — skip rate limiting gracefully
+        except Exception:
+            return
+        await rate_limiter(request)  # delegate to the real limiter
 
-    return RateLimiter(times=times, seconds=seconds)
+    return _dependency
 
 
 @router.post(
@@ -40,7 +45,7 @@ def optional_rate_limiter(times: int, seconds: int):
     status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(optional_rate_limiter(times=5, seconds=60))],
 )
-def signup(data: SignupRequest, db: Session = Depends(get_db)):
+def signup(data: SignupRequest, response: Response, db: Session = Depends(get_db)) -> MessageResponse:
     """Register a new student account. Rate limited to 5 requests/minute per IP (when Redis is available)."""
     auth_service.signup(db, data)
     return MessageResponse(message="Account created successfully. Please log in.")

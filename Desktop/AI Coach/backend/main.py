@@ -12,7 +12,7 @@ from app.core.config import settings
 from app.core.logger import get_logger
 from app.middleware.logging import RequestLoggingMiddleware
 from app.utils.response import error_response
-from app.api import auth, users, health, dashboard
+from app.api import auth, users, health, dashboard, tasks, habits, study_sessions, productivity, ai_coach
 
 log = get_logger(__name__)
 
@@ -111,6 +111,11 @@ app.include_router(auth.router, prefix=API_PREFIX)
 app.include_router(users.router, prefix=API_PREFIX)
 app.include_router(health.router, prefix=API_PREFIX)
 app.include_router(dashboard.router, prefix=API_PREFIX)
+app.include_router(tasks.router, prefix=API_PREFIX)
+app.include_router(habits.router, prefix=API_PREFIX)
+app.include_router(study_sessions.router, prefix=API_PREFIX)
+app.include_router(productivity.router, prefix=API_PREFIX)
+app.include_router(ai_coach.router, prefix=API_PREFIX)
 
 
 # ─── Root ─────────────────────────────────────────────────────────────────────

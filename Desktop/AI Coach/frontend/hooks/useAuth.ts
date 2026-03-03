@@ -30,6 +30,9 @@ export function useAuth() {
             const { data } = await api.post<TokenResponse>("/auth/login", payload);
             localStorage.setItem("access_token", data.access_token);
             localStorage.setItem("refresh_token", data.refresh_token);
+            // Also store in cookie so Next.js middleware can read it (localStorage is not
+            // accessible in server-side middleware).
+            document.cookie = `access_token=${data.access_token}; path=/; SameSite=Lax`;
             router.push("/dashboard");
         } catch (err: any) {
             setError(err.response?.data?.error ?? err.response?.data?.detail ?? "Invalid email or password.");
@@ -41,6 +44,8 @@ export function useAuth() {
     const logout = () => {
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
+        // Clear the auth cookie so middleware correctly redirects to /login
+        document.cookie = "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
         router.push("/login");
     };
 

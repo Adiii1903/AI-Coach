@@ -1,9 +1,16 @@
 import uuid
 from datetime import datetime, timezone
+from typing import TYPE_CHECKING, List
 from sqlalchemy import String, Boolean, DateTime, Text, Index
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 from app.db.base import Base
+
+if TYPE_CHECKING:
+    from app.models.task import Task
+    from app.models.habit import Habit
+    from app.models.study_session import StudySession
+    from app.models.ai_insight import AIInsight
 
 
 class User(Base):
@@ -20,6 +27,20 @@ class User(Base):
     )
     last_active: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+
+    # ─── Relationships ────────────────────────────────────────────────────────
+    tasks: Mapped[List["Task"]] = relationship(
+        "Task", back_populates="user", cascade="all, delete-orphan"
+    )
+    habits: Mapped[List["Habit"]] = relationship(
+        "Habit", back_populates="user", cascade="all, delete-orphan"
+    )
+    study_sessions: Mapped[List["StudySession"]] = relationship(
+        "StudySession", back_populates="user", cascade="all, delete-orphan"
+    )
+    ai_insights: Mapped[List["AIInsight"]] = relationship(
+        "AIInsight", back_populates="user", cascade="all, delete-orphan"
     )
 
     # ─── Explicit named indexes ──────────────────────────────────────────────

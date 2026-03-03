@@ -16,6 +16,7 @@ from app.schemas.dashboard import (
     HabitsSummary,
     AICoachSummary,
 )
+from app.services.productivity_service import productivity_service
 
 log = get_logger(__name__)
 
@@ -135,23 +136,6 @@ def _get_ai_insight(db: Session, user_id: uuid.UUID) -> AICoachSummary:
         return AICoachSummary(latest_message=None)
 
 
-def _calculate_productivity_score(
-    tasks: TasksSummary,
-    study: StudySummary,
-    habits: HabitsSummary,
-) -> int:
-    """
-    Weighted productivity score (0–100):
-      - Tasks completed today : 40 pts max  (10 pts each, cap 4)
-      - Study hours today      : 30 pts max  (10 pts/hr, cap 3h)
-      - Habits completed today : 30 pts max  (10 pts each, cap 3)
-    """
-    task_score = min(tasks.completed_today * 10, 40)
-    study_score = min(int(study.hours_today * 10), 30)
-    habit_score = min(habits.completed_today * 10, 30)
-    return task_score + study_score + habit_score
-
-
 # ─── Main service function ────────────────────────────────────────────────────
 
 async def get_dashboard(
@@ -182,10 +166,14 @@ async def get_dashboard(
     study = _get_study_summary(db, user_id)
     habits = _get_habits_summary(db, user_id)
     ai_coach = _get_ai_insight(db, user_id)
-    score = _calculate_productivity_score(tasks, study, habits)
+    
+    score_data = productivity_service.calculate_productivity_score(db, user_id)
 
     response = DashboardResponse(
-        productivity_score=score,
+        productivity_score=score_data["productivity_score"],
+        tasks_completed_today=score_data["tasks_completed_today"],
+        study_hours_today=score_data["study_hours_today"],
+        habits_completed_today=score_data["habits_completed_today"],
         tasks=tasks,
         study=study,
         habits=habits,

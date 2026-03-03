@@ -1,16 +1,9 @@
 {
-    "include": [
-        "app",
-        "main.py",
-        "alembic"
-    ],
-    "exclude": [
-        "**/__pycache__"
-    ],
     "venvPath": ".",
     "venv": "venv",
-    "pythonVersion": "3.11",
+    "extraPaths": [
+        "."
+    ],
     "typeCheckingMode": "basic",
-    "reportMissingImports": "warning",
-    "reportMissingModuleSource": "none"
+    "reportMissingImports": "warning"
 }

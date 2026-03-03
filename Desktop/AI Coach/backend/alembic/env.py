@@ -13,6 +13,11 @@ from app.db.base import Base
 
 # Import all models here so Alembic can detect them for autogenerate
 from app.models.user import User, RefreshToken  # noqa: F401
+from app.models.task import Task  # noqa: F401
+from app.models.habit import Habit  # noqa: F401
+from app.models.habit_log import HabitLog  # noqa: F401
+from app.models.study_session import StudySession  # noqa: F401
+from app.models.ai_insight import AIInsight  # noqa: F401
 
 config = context.config
 

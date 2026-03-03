@@ -46,7 +46,7 @@ class BaseService(Generic[ModelType]):
     def get_by_id(self, db: Session, record_id: Any) -> ModelType:
         """Return a single record by primary key, or raise 404."""
         instance = db.scalar(
-            select(self.model).where(self.model.id == record_id)
+            select(self.model).where(getattr(self.model, 'id') == record_id)
         )
         if not instance:
             raise HTTPException(
