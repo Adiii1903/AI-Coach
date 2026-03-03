@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.venv/
+venv/
+env/
+
+# Env
+.env
+
+# Alembic
+alembic/versions/*.pyc
+
+# Logs (keep the directory, ignore the files)
+logs/*.log
+logs/*.log.zip
+
+# IDE
+.vscode/
+.idea/
